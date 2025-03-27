@@ -315,10 +315,31 @@ function generateSVG() {
       if (showText) {
         // Calculate the proper y-position based on marker existence with improved position
         // Increase the fontSize multiplier to move text lower
-        const yText = tileSize + (includeLine ? (gap + thickness + textGap) : textGap) + fontSize * 0.5; // Increased from 0.3 to 0.5
+        const yText = tileSize + (includeLine ? (gap + thickness + textGap) : textGap) + fontSize * 0.5;
+        
+        // For very small tiles, simplify or hide the text
+        let displayText = labelText;
+        let useTextLength = true;
+        
+        // When the tile is extremely small, only show the code or number
+        if (tileSize < 8) {
+          displayText = codeLetters; // Only show the code letters for very small tiles
+        }
+        
+        // For extremely tiny tiles, hide text completely
+        if (tileSize < 4) {
+          // Don't show text for extremely small tiles
+          useTextLength = false; 
+          displayText = "";
+        }
         
         // Add text with proper alignment that stays within the marker width
-        svg += `<text x="0" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start">${labelText}</text>`;
+        // Add textLength attribute to ensure text doesn't exceed the tile width
+        // Use lengthAdjust="spacingAndGlyphs" to make the whole text scale uniformly
+        if (displayText) {
+          svg += `<text x="0" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start" 
+                  ${useTextLength ? `textLength="${tileSize}" lengthAdjust="spacingAndGlyphs"` : ''}>${displayText}</text>`;
+        }
       }
 
       svg += `</g>`; // end tile group
