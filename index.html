@@ -6,8 +6,7 @@
   <title>Unique 2x2 Tag Generator</title>
   <!-- Modern Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <!-- Add color picker library -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/> 
+  <!-- Simple Color Picker CSS - no external dependencies -->
   <style>
     :root {
       --primary-color: #4361ee;
@@ -16,6 +15,8 @@
       --card-bg: #ffffff;
       --text-color: #333;
       --border-color: #e0e0e0;
+      --slider-track: #ddd;
+      --slider-thumb: #4361ee;
     }
     
     body {
@@ -33,6 +34,13 @@
       padding: 0 20px;
     }
     
+    @media (max-width: 768px) {
+      .container {
+        margin: 15px auto;
+        padding: 0 15px;
+      }
+    }
+    
     header {
       margin-bottom: 30px;
       text-align: center;
@@ -42,6 +50,13 @@
       color: var(--text-color);
       margin-top: 0;
       font-weight: 600;
+      font-size: 2rem;
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
     }
     
     .card {
@@ -50,6 +65,13 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       margin-bottom: 30px;
+    }
+    
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px 15px;
+        border-radius: 8px;
+      }
     }
     
     h2 {
@@ -68,16 +90,41 @@
       margin-bottom: 20px;
     }
     
+    .slider-group {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .slider-group input[type="number"] {
+      width: 60px;
+      text-align: center;
+    }
+    
     .grid-2col {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 24px;
     }
     
+    @media (max-width: 768px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+    
     .grid-4col {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .grid-4col {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
     }
     
     label {
@@ -90,7 +137,7 @@
     input[type="number"],
     input[type="text"],
     select {
-      padding: 8px 12px;
+      padding: 10px 12px;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 0.95rem;
@@ -100,13 +147,83 @@
       font-family: 'Inter', sans-serif;
     }
     
+    /* Styling for range sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--slider-track);
+      outline: none;
+      margin: 10px 0;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--slider-thumb);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--slider-thumb);
+      cursor: pointer;
+      transition: background 0.2s;
+      border: none;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--primary-hover);
+    }
+    
+    input[type="range"]::-moz-range-thumb:hover {
+      background: var(--primary-hover);
+    }
+    
     input:focus, select:focus {
       outline: none;
       border-color: var(--primary-color);
     }
     
-    .color-picker-wrapper {
+    .color-picker {
+      width: 100%;
       margin-top: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+      height: 40px;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .color-picker-input {
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .color-display {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-shadow: 0px 0px 2px rgba(0,0,0,0.7);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
     }
     
     .button-group {
@@ -115,8 +232,14 @@
       gap: 10px;
     }
     
+    @media (max-width: 480px) {
+      .button-group {
+        flex-direction: column;
+      }
+    }
+    
     button {
-      padding: 10px 18px;
+      padding: 12px 18px;
       border: none;
       background: var(--primary-color);
       color: white;
@@ -125,6 +248,7 @@
       font-size: 0.95rem;
       font-weight: 500;
       transition: background 0.2s, transform 0.1s;
+      min-height: 48px; /* Better for touch */
     }
     
     button:hover {
@@ -147,12 +271,19 @@
     .checkbox-group {
       display: flex;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
     }
     
     .checkbox-group label {
       margin-bottom: 0;
       margin-left: 8px;
+      cursor: pointer;
     }
     
     #svgContainer {
@@ -173,12 +304,6 @@
     .quadrant-settings {
       margin-bottom: 30px;
     }
-    
-    .tile-preview {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
   </style>
 </head>
 
@@ -196,36 +321,36 @@
           <div class="form-group">
             <label for="letterTL">Top-Left Letter:</label>
             <input type="text" id="letterTL" value="C" maxlength="1">
-            <div class="color-picker-wrapper">
-              <input type="hidden" id="colorTL" value="#00FFFF">
-              <div id="pickerTL" class="color-picker"></div>
+            <div class="color-picker" id="pickerTL">
+              <input type="color" id="colorTL" value="#00FFFF" class="color-picker-input">
+              <div class="color-display" style="background-color: #00FFFF;">C</div>
             </div>
           </div>
           
           <div class="form-group">
             <label for="letterTR">Top-Right Letter:</label>
             <input type="text" id="letterTR" value="M" maxlength="1">
-            <div class="color-picker-wrapper">
-              <input type="hidden" id="colorTR" value="#FF00FF">
-              <div id="pickerTR" class="color-picker"></div>
+            <div class="color-picker" id="pickerTR">
+              <input type="color" id="colorTR" value="#FF00FF" class="color-picker-input">
+              <div class="color-display" style="background-color: #FF00FF;">M</div>
             </div>
           </div>
           
           <div class="form-group">
             <label for="letterBL">Bottom-Left Letter:</label>
             <input type="text" id="letterBL" value="Y" maxlength="1">
-            <div class="color-picker-wrapper">
-              <input type="hidden" id="colorBL" value="#FFFF00">
-              <div id="pickerBL" class="color-picker"></div>
+            <div class="color-picker" id="pickerBL">
+              <input type="color" id="colorBL" value="#FFFF00" class="color-picker-input">
+              <div class="color-display" style="background-color: #FFFF00;">Y</div>
             </div>
           </div>
           
           <div class="form-group">
             <label for="letterBR">Bottom-Right Letter:</label>
             <input type="text" id="letterBR" value="K" maxlength="1">
-            <div class="color-picker-wrapper">
-              <input type="hidden" id="colorBR" value="#000000">
-              <div id="pickerBR" class="color-picker"></div>
+            <div class="color-picker" id="pickerBR">
+              <input type="color" id="colorBR" value="#000000" class="color-picker-input">
+              <div class="color-display" style="background-color: #000000;">K</div>
             </div>
           </div>
         </div>
@@ -249,11 +374,17 @@
             <div class="grid-2col">
               <div class="form-group">
                 <label for="customWidth">Width (mm):</label>
-                <input type="number" id="customWidth" value="100" min="10" step="1">
+                <div class="slider-group">
+                  <input type="range" id="customWidthSlider" min="10" max="500" value="100" step="1">
+                  <input type="number" id="customWidth" value="100" min="10" step="1">
+                </div>
               </div>
               <div class="form-group">
                 <label for="customHeight">Height (mm):</label>
-                <input type="number" id="customHeight" value="100" min="10" step="1">
+                <div class="slider-group">
+                  <input type="range" id="customHeightSlider" min="10" max="500" value="100" step="1">
+                  <input type="number" id="customHeight" value="100" min="10" step="1">
+                </div>
               </div>
             </div>
           </div>
@@ -261,9 +392,9 @@
         
         <div class="form-group">
           <label for="markerColor">Marker Color:</label>
-          <div class="color-picker-wrapper">
-            <input type="hidden" id="markerColor" value="#FF0000">
-            <div id="pickerMarker" class="color-picker"></div>
+          <div class="color-picker" id="pickerMarker">
+            <input type="color" id="markerColor" value="#FF0000" class="color-picker-input">
+            <div class="color-display" style="background-color: #FF0000;">Marker</div>
           </div>
         </div>
       </div>
@@ -273,34 +404,52 @@
         <div>
           <div class="form-group">
             <label for="tileSize">Tile Size (mm):</label>
-            <input type="number" id="tileSize" value="20" min="5" step="1">
+            <div class="slider-group">
+              <input type="range" id="tileSizeSlider" min="5" max="50" value="20" step="1">
+              <input type="number" id="tileSize" value="20" min="5" max="50" step="1">
+            </div>
           </div>
           
           <div class="form-group">
             <label for="tileMargin">Tile Margin (mm):</label>
-            <input type="number" id="tileMargin" value="5" min="0" step="1">
+            <div class="slider-group">
+              <input type="range" id="tileMarginSlider" min="0" max="20" value="5" step="1">
+              <input type="number" id="tileMargin" value="5" min="0" max="20" step="1">
+            </div>
           </div>
           
           <div class="form-group">
             <label for="linePadding">Line Padding (% of tile):</label>
-            <input type="number" id="linePadding" value="10" min="1" max="50" step="1">
+            <div class="slider-group">
+              <input type="range" id="linePaddingSlider" min="1" max="50" value="10" step="1">
+              <input type="number" id="linePadding" value="10" min="1" max="50" step="1">
+            </div>
           </div>
         </div>
         
         <div>
           <div class="form-group">
             <label for="tileRows">Number of Rows:</label>
-            <input type="number" id="tileRows" value="10" min="1" step="1">
+            <div class="slider-group">
+              <input type="range" id="tileRowsSlider" min="1" max="30" value="10" step="1">
+              <input type="number" id="tileRows" value="10" min="1" max="30" step="1">
+            </div>
           </div>
           
           <div class="form-group">
             <label for="tileCols">Number of Columns:</label>
-            <input type="number" id="tileCols" value="5" min="1" step="1">
+            <div class="slider-group">
+              <input type="range" id="tileColsSlider" min="1" max="20" value="5" step="1">
+              <input type="number" id="tileCols" value="5" min="1" max="20" step="1">
+            </div>
           </div>
           
           <div class="form-group">
             <label for="startSeq">Start Sequence Number:</label>
-            <input type="number" id="startSeq" value="1" min="0" step="1">
+            <div class="slider-group">
+              <input type="range" id="startSeqSlider" min="0" max="100" value="1" step="1">
+              <input type="number" id="startSeq" value="1" min="0" step="1">
+            </div>
           </div>
         </div>
       </div>
@@ -337,62 +486,79 @@
     </div>
   </div>
 
-  <!-- Color Picker Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
-
   <script>
-    // Initialize color pickers when page loads
+    // Initialize color pickers and sync with letters
     document.addEventListener('DOMContentLoaded', function() {
-      // Common pickr options
-      const pickrOptions = {
-        el: '.color-picker',
-        theme: 'nano',
-        useAsButton: true,
-        defaultRepresentation: 'HEX',
-        swatches: [
-          '#f44336', '#E91E63', '#9C27B0', '#673AB7',
-          '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4',
-          '#009688', '#4CAF50', '#8BC34A', '#CDDC39',
-          '#FFEB3B', '#FFC107', '#FF9800', '#FF5722',
-          '#795548', '#9E9E9E', '#607D8B', '#000000'
-        ],
-        components: {
-          preview: true,
-          opacity: true,
-          hue: true,
-          interaction: {
-            hex: true,
-            rgba: true,
-            input: true,
-            save: true
-          }
-        }
-      };
-      
-      // Create each color picker with its initial value
-      const createPickr = (elementId, inputId, initialColor) => {
-        const options = {...pickrOptions, el: elementId};
-        const pickr = Pickr.create(options);
+      // Function to setup color picker behavior
+      function setupColorPicker(colorInputId, displaySelector, letterInputId) {
+        const colorInput = document.getElementById(colorInputId);
+        const display = document.querySelector(displaySelector);
+        const letterInput = document.getElementById(letterInputId);
         
-        // Set initial color
-        pickr.setColor(initialColor);
-        
-        // Update hidden input when color changes
-        pickr.on('save', (color) => {
-          document.getElementById(inputId).value = color.toHEXA().toString();
-          pickr.hide();
+        // Update display when color changes
+        colorInput.addEventListener('input', function() {
+          display.style.backgroundColor = this.value;
+          // Auto-adjust text color based on background brightness
+          const rgb = hexToRgb(this.value);
+          const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+          display.style.color = brightness > 125 ? '#000000' : '#ffffff';
         });
         
-        return pickr;
-      };
+        // Update letter on display when letter input changes
+        if (letterInput) {
+          letterInput.addEventListener('input', function() {
+            display.textContent = this.value || ' ';
+          });
+        }
+      }
       
-      // Initialize all pickers
-      createPickr('#pickerTL', 'colorTL', '#00FFFF');  // Cyan
-      createPickr('#pickerTR', 'colorTR', '#FF00FF');  // Magenta
-      createPickr('#pickerBL', 'colorBL', '#FFFF00');  // Yellow
-      createPickr('#pickerBR', 'colorBR', '#000000');  // Black (K)
-      createPickr('#pickerMarker', 'markerColor', '#FF0000'); // Red
+      // Setup all color pickers
+      setupColorPicker('colorTL', '#pickerTL .color-display', 'letterTL');
+      setupColorPicker('colorTR', '#pickerTR .color-display', 'letterTR');
+      setupColorPicker('colorBL', '#pickerBL .color-display', 'letterBL');
+      setupColorPicker('colorBR', '#pickerBR .color-display', 'letterBR');
+      setupColorPicker('markerColor', '#pickerMarker .color-display');
+      
+      // Setup all slider-number pairs
+      setupSliderNumberPair('tileSizeSlider', 'tileSize');
+      setupSliderNumberPair('tileMarginSlider', 'tileMargin');
+      setupSliderNumberPair('linePaddingSlider', 'linePadding');
+      setupSliderNumberPair('tileRowsSlider', 'tileRows');
+      setupSliderNumberPair('tileColsSlider', 'tileCols');
+      setupSliderNumberPair('startSeqSlider', 'startSeq');
+      setupSliderNumberPair('customWidthSlider', 'customWidth');
+      setupSliderNumberPair('customHeightSlider', 'customHeight');
     });
+    
+    // Helper function to convert hex to RGB
+    function hexToRgb(hex) {
+      // Remove the # if present
+      hex = hex.replace(/^#/, '');
+      
+      // Parse the components
+      let bigint = parseInt(hex, 16);
+      let r = (bigint >> 16) & 255;
+      let g = (bigint >> 8) & 255;
+      let b = bigint & 255;
+      
+      return { r, g, b };
+    }
+    
+    // Function to sync slider with number input
+    function setupSliderNumberPair(sliderId, numberId) {
+      const slider = document.getElementById(sliderId);
+      const number = document.getElementById(numberId);
+      
+      // Update number when slider changes
+      slider.addEventListener('input', function() {
+        number.value = this.value;
+      });
+      
+      // Update slider when number changes
+      number.addEventListener('input', function() {
+        slider.value = this.value;
+      });
+    }
 
     // Show/hide custom canvas fields
     function toggleCustomCanvas() {
