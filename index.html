@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chukké - Tag Generator</title>
+  <meta name="description" content="Create unique color-coded identification tags with Chukké. Generate customizable, printable SVG tags for tracking and labeling.">
+  <title>Chukké - Unique Color Tag Generator</title>
+  <!-- Favicon (inline SVG as base64) -->
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjMDBGRkZGIi8+PHJlY3QgeD0iMTYiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI0ZGMDBGRiIvPjxyZWN0IHg9IjAiIHk9IjE2IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IiNGRkZGMDAiLz48cmVjdCB4PSIxNiIgeT0iMTYiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iIzAwMDAwMCIvPjxwb2x5Z29uIHBvaW50cz0iMCwwIDgsMCAwLDgiIGZpbGw9IiM4MDgwODAiLz48L3N2Zz4=">
   <!-- Modern Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- External CSS -->
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -13,6 +16,15 @@
 <body>
   <div class="container">
     <header>
+      <div class="logo">
+        <svg width="40" height="40" viewBox="0 0 32 32">
+          <rect x="0" y="0" width="16" height="16" fill="#00FFFF"/>
+          <rect x="16" y="0" width="16" height="16" fill="#FF00FF"/>
+          <rect x="0" y="16" width="16" height="16" fill="#FFFF00"/>
+          <rect x="16" y="16" width="16" height="16" fill="#000000"/>
+          <polygon points="0,0 8,0 0,8" fill="#808080"/>
+        </svg>
+      </div>
       <h1>ಚುಕ್ಕೆ Chukké - Colourful Unique Tag Generator</h1>
       <p>Create unique identification tags with color quadrants for tracking and identification purposes. Chukké ಚುಕ್ಕೆ means "dots" or "marks" in Kannada, which perfectly represents this tool's purpose: creating unique visual identification tags for tracking or marking items.</p>
     </header>
@@ -32,7 +44,7 @@
           <input type="number" id="numColors" value="4" min="2" max="8" step="1" title="Number of unique colors to use">
         </div>
         <p class="help-text">
-          With <span id="colorCountDisplay">4</span> colors, you can create up to <span id="maxTagsDisplay">256</span> unique tags.
+          With <span id="colorCountDisplay">4</span> colors, you can create up to <span id="maxTagsDisplay" class="highlight">256</span> unique tags.
         </p>
       </div>
       

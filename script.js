@@ -306,39 +306,44 @@ function generateSVG() {
       // For very small markers, reduce the text size more aggressively
       let fontSize;
       if (tileSize < 5) {
-        fontSize = Math.max(1, tileSize * 0.08); // More aggressive scaling for tiny tiles
+        fontSize = Math.max(0.5, tileSize * 0.08); // More aggressive scaling for tiny tiles
       } else {
-        fontSize = Math.max(3, tileSize * 0.12);
+        fontSize = Math.max(1, tileSize * 0.12);
       }
 
       // Place text below markers with improved positioning
       if (showText) {
         // Calculate the proper y-position based on marker existence with improved position
-        // Increase the fontSize multiplier to move text lower
-        const yText = tileSize + (includeLine ? (gap + thickness + textGap) : textGap) + fontSize * 0.5;
+        // Move text significantly lower (100% more of text height)
+        const textHeight = fontSize * 1.2; // Approximate text height
+        const yText = tileSize + (includeLine ? (gap + thickness + textGap) : textGap) + textHeight;
         
-        // For very small tiles, simplify or hide the text
+        // Always show the full text, but adjust for small sizes if needed
         let displayText = labelText;
-        let useTextLength = true;
         
-        // When the tile is extremely small, only show the code or number
+        // For very small tiles, we may want to show just the code letters
+        // to increase readability, but if user wants all text, we keep it
+        /*
         if (tileSize < 8) {
-          displayText = codeLetters; // Only show the code letters for very small tiles
+          displayText = codeLetters;
         }
         
         // For extremely tiny tiles, hide text completely
         if (tileSize < 4) {
-          // Don't show text for extremely small tiles
           useTextLength = false; 
           displayText = "";
         }
+        */
         
         // Add text with proper alignment that stays within the marker width
-        // Add textLength attribute to ensure text doesn't exceed the tile width
-        // Use lengthAdjust="spacingAndGlyphs" to make the whole text scale uniformly
-        if (displayText) {
+        // Only constrain text width if necessary, not by default
+        svg += `<text x="0" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start">${displayText}</text>`;
+        
+        // Add a second text with just dots in case we need to trim text width
+        if (tileSize < 10) {
+          // For very small tiles, add a fallback dots-only version that's constrained
           svg += `<text x="0" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start" 
-                  ${useTextLength ? `textLength="${tileSize}" lengthAdjust="spacingAndGlyphs"` : ''}>${displayText}</text>`;
+                  textLength="${tileSize}" lengthAdjust="spacingAndGlyphs" class="dots-only">${codeLetters}</text>`;
         }
       }
 
