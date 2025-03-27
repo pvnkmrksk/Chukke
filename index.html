@@ -1,90 +1,399 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Unique 2x2 Tag Generator</title>
   <!-- Modern Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Add color picker library -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/> 
   <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-hover: #3a56d4;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --border-color: #e0e0e0;
+    }
+    
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Inter', sans-serif;
       margin: 0; 
       padding: 0; 
-      background: #f7f7f7; 
-      color: #333;
+      background: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
     }
+    
     .container {
-      max-width: 900px;
-      margin: 20px auto;
-      background: #fff;
-      padding: 20px 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
     }
-    h1, h2 {
-      color: #444;
+    
+    header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    h1 {
+      color: var(--text-color);
       margin-top: 0;
+      font-weight: 600;
     }
+    
+    .card {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+    
+    h2 {
+      font-size: 1.3rem;
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: var(--text-color);
+      font-weight: 600;
+    }
+    
     p {
-      line-height: 1.4;
+      margin-bottom: 20px;
     }
-    .section {
-      margin-bottom: 24px;
+    
+    .form-group {
+      margin-bottom: 20px;
     }
-    /* Use CSS grid for a cleaner form layout */
+    
     .grid-2col {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      align-items: start;
+      gap: 24px;
     }
+    
+    .grid-4col {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    
     label {
       margin-bottom: 8px;
       display: block;
       font-weight: 500;
+      font-size: 0.95rem;
     }
+    
     input[type="number"],
     input[type="text"],
-    select,
-    input[type="color"] {
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    select {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
       font-size: 0.95rem;
       width: 100%;
       box-sizing: border-box;
-      margin-top: 4px;
-      font-family: 'Roboto', sans-serif;
+      transition: border-color 0.2s;
+      font-family: 'Inter', sans-serif;
     }
-    /* Buttons */
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+    
+    .color-picker-wrapper {
+      margin-top: 8px;
+    }
+    
+    .button-group {
+      margin-top: 25px;
+      display: flex;
+      gap: 10px;
+    }
+    
     button {
-      padding: 10px 20px;
+      padding: 10px 18px;
       border: none;
-      background: #007BFF;
-      color: #fff;
-      border-radius: 4px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 6px;
       cursor: pointer;
-      margin-top: 10px;
-      margin-right: 10px;
       font-size: 0.95rem;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.1s;
     }
+    
     button:hover {
-      background: #0056b3;
+      background: var(--primary-hover);
     }
+    
+    button:active {
+      transform: translateY(1px);
+    }
+    
+    .button-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    
+    .button-secondary:hover {
+      background: #e4e4e4;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .checkbox-group label {
+      margin-bottom: 0;
+      margin-left: 8px;
+    }
+    
     #svgContainer {
       margin-top: 20px;
-      padding: 10px;
+      padding: 20px;
       background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
       overflow-x: auto;
     }
+    
     /* Hide custom canvas fields by default */
     #customCanvas {
       display: none;
+      margin-top: 15px;
+    }
+    
+    .quadrant-settings {
+      margin-bottom: 30px;
+    }
+    
+    .tile-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Unique 2x2 Tag Generator</h1>
+      <p>Create unique identification tags with color quadrants for tracking and identification purposes</p>
+    </header>
+    
+    <div class="card">
+      <h2>Quadrant Settings</h2>
+      <div class="quadrant-settings">
+        <div class="grid-4col">
+          <div class="form-group">
+            <label for="letterTL">Top-Left Letter:</label>
+            <input type="text" id="letterTL" value="C" maxlength="1">
+            <div class="color-picker-wrapper">
+              <input type="hidden" id="colorTL" value="#00FFFF">
+              <div id="pickerTL" class="color-picker"></div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="letterTR">Top-Right Letter:</label>
+            <input type="text" id="letterTR" value="M" maxlength="1">
+            <div class="color-picker-wrapper">
+              <input type="hidden" id="colorTR" value="#FF00FF">
+              <div id="pickerTR" class="color-picker"></div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="letterBL">Bottom-Left Letter:</label>
+            <input type="text" id="letterBL" value="Y" maxlength="1">
+            <div class="color-picker-wrapper">
+              <input type="hidden" id="colorBL" value="#FFFF00">
+              <div id="pickerBL" class="color-picker"></div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="letterBR">Bottom-Right Letter:</label>
+            <input type="text" id="letterBR" value="K" maxlength="1">
+            <div class="color-picker-wrapper">
+              <input type="hidden" id="colorBR" value="#000000">
+              <div id="pickerBR" class="color-picker"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <h2>Canvas Settings</h2>
+      <div class="grid-2col">
+        <div class="form-group">
+          <label for="canvasSize">Canvas Size:</label>
+          <select id="canvasSize" onchange="toggleCustomCanvas()">
+            <option value="A4">A4 (210×297mm)</option>
+            <option value="Letter">Letter (216×279mm)</option>
+            <option value="A3">A3 (297×420mm)</option>
+            <option value="A5">A5 (148×210mm)</option>
+            <option value="A6">A6 (105×148mm)</option>
+            <option value="4x6">4×6" (101.6×152.4mm)</option>
+            <option value="Custom">Custom Size</option>
+          </select>
+          
+          <div id="customCanvas">
+            <div class="grid-2col">
+              <div class="form-group">
+                <label for="customWidth">Width (mm):</label>
+                <input type="number" id="customWidth" value="100" min="10" step="1">
+              </div>
+              <div class="form-group">
+                <label for="customHeight">Height (mm):</label>
+                <input type="number" id="customHeight" value="100" min="10" step="1">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="markerColor">Marker Color:</label>
+          <div class="color-picker-wrapper">
+            <input type="hidden" id="markerColor" value="#FF0000">
+            <div id="pickerMarker" class="color-picker"></div>
+          </div>
+        </div>
+      </div>
+      
+      <h2>Tile Settings</h2>
+      <div class="grid-2col">
+        <div>
+          <div class="form-group">
+            <label for="tileSize">Tile Size (mm):</label>
+            <input type="number" id="tileSize" value="20" min="5" step="1">
+          </div>
+          
+          <div class="form-group">
+            <label for="tileMargin">Tile Margin (mm):</label>
+            <input type="number" id="tileMargin" value="5" min="0" step="1">
+          </div>
+          
+          <div class="form-group">
+            <label for="linePadding">Line Padding (% of tile):</label>
+            <input type="number" id="linePadding" value="10" min="1" max="50" step="1">
+          </div>
+        </div>
+        
+        <div>
+          <div class="form-group">
+            <label for="tileRows">Number of Rows:</label>
+            <input type="number" id="tileRows" value="10" min="1" step="1">
+          </div>
+          
+          <div class="form-group">
+            <label for="tileCols">Number of Columns:</label>
+            <input type="number" id="tileCols" value="5" min="1" step="1">
+          </div>
+          
+          <div class="form-group">
+            <label for="startSeq">Start Sequence Number:</label>
+            <input type="number" id="startSeq" value="1" min="0" step="1">
+          </div>
+        </div>
+      </div>
+      
+      <h2>Marker Options</h2>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="includeNotch" checked>
+          <label for="includeNotch">Include Corner Notch</label>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="includeLine" checked>
+          <label for="includeLine">Include Bottom Line</label>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="showText" checked>
+          <label for="showText">Show Text Label</label>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="generateSVG()">Generate Tags</button>
+        <button onclick="downloadSVG()" class="button-secondary">Download SVG</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Preview</h2>
+      <div id="svgContainer">
+        <p>Tags will appear here after generation</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Color Picker Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+
   <script>
+    // Initialize color pickers when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Common pickr options
+      const pickrOptions = {
+        el: '.color-picker',
+        theme: 'nano',
+        useAsButton: true,
+        defaultRepresentation: 'HEX',
+        swatches: [
+          '#f44336', '#E91E63', '#9C27B0', '#673AB7',
+          '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4',
+          '#009688', '#4CAF50', '#8BC34A', '#CDDC39',
+          '#FFEB3B', '#FFC107', '#FF9800', '#FF5722',
+          '#795548', '#9E9E9E', '#607D8B', '#000000'
+        ],
+        components: {
+          preview: true,
+          opacity: true,
+          hue: true,
+          interaction: {
+            hex: true,
+            rgba: true,
+            input: true,
+            save: true
+          }
+        }
+      };
+      
+      // Create each color picker with its initial value
+      const createPickr = (elementId, inputId, initialColor) => {
+        const options = {...pickrOptions, el: elementId};
+        const pickr = Pickr.create(options);
+        
+        // Set initial color
+        pickr.setColor(initialColor);
+        
+        // Update hidden input when color changes
+        pickr.on('save', (color) => {
+          document.getElementById(inputId).value = color.toHEXA().toString();
+          pickr.hide();
+        });
+        
+        return pickr;
+      };
+      
+      // Initialize all pickers
+      createPickr('#pickerTL', 'colorTL', '#00FFFF');  // Cyan
+      createPickr('#pickerTR', 'colorTR', '#FF00FF');  // Magenta
+      createPickr('#pickerBL', 'colorBL', '#FFFF00');  // Yellow
+      createPickr('#pickerBR', 'colorBR', '#000000');  // Black (K)
+      createPickr('#pickerMarker', 'markerColor', '#FF0000'); // Red
+    });
+
     // Show/hide custom canvas fields
     function toggleCustomCanvas() {
       const canvasSelect = document.getElementById("canvasSize").value;
