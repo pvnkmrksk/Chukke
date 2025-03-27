@@ -4,6 +4,11 @@ Chukké (ಚುಕ್ಕೆ) means "dots" or "marks" in Kannada, which perfectly
 
 🚀 **[Try it now: Launch Chukké Tag Generator](https://pvnkmrksk.github.io/Chukke/)**
 
+<div align="center">
+  <img src="./anim.gif" alt="Animated Chukké tags showcase" width="240" />
+  <p><em>Animation showcasing the variety of unique tags possible with Chukké</em></p>
+</div>
+
 ## What is Chukké?
 
 Chukké generates unique 2×2 color quadrant tags, each with its own distinct identification number. The system uses a base-4 encoding which allows for thousands of unique combinations using just four colors.
@@ -66,6 +71,15 @@ The SVG output is vector-based, so it scales perfectly to any size and prints wi
 - Print directly from the browser
 - Import into design software
 - Use with label printers (adjust size accordingly)
+
+## Tag Diversity
+
+With the default CMYK color system, Chukké can generate 256 unique tag patterns (4^4). The animated GIF at the top of this README demonstrates this diversity by showing various tag patterns created using the base-4 encoding system.
+
+For custom applications, you can:
+- Use any 4 colors of your choice
+- Expand to up to 8 colors for even more unique combinations (8^4 = 4,096 possibilities)
+- Reduce to just 2 colors for simpler binary encoding
 
 ## Technical Implementation
 
