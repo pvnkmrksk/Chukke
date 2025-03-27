@@ -2,6 +2,8 @@
 
 Chukké (ಚುಕ್ಕೆ) means "dots" or "marks" in Kannada, which perfectly represents this tool's purpose: creating unique visual identification tags for tracking or marking items.
 
+🚀 **[Try it now: Launch Chukké Tag Generator](https://pvnkmrksk.github.io/Chukke/)**
+
 ## What is Chukké?
 
 Chukké generates unique 2×2 color quadrant tags, each with its own distinct identification number. The system uses a base-4 encoding which allows for thousands of unique combinations using just four colors.
@@ -50,6 +52,14 @@ Chukké generates unique 2×2 color quadrant tags, each with its own distinct id
 - **Board game prototyping**: Create tokens with unique identifiable patterns
 - **Educational tools**: Demonstrate base-4 numbering systems with visual representations
 
+## Example Output
+
+Below is an example of what generated tags look like. Each tag has a unique color pattern representing its ID number, with orientation markers for clear positioning.
+
+![Generated Chukké tags example](./example.png)
+
+The SVG output is vector-based, so it scales perfectly to any size and prints with high quality.
+
 ## Technical Implementation
 
 Chukké is implemented as a stand-alone HTML file with inline JavaScript and CSS. The application runs entirely in the browser and requires no server-side processing.
@@ -63,3 +73,7 @@ MIT License
 ## Contributing
 
 Contributions, suggestions, and bug reports are welcome! Feel free to open an issue or submit a pull request.
+
+---
+
+Made with ❤️ by [@pvnkmrksk](https://twitter.com/pvnkmrksk)

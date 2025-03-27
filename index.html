@@ -340,6 +340,23 @@
       color: #666;
       margin-bottom: 15px;
     }
+    
+    footer {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+    
+    footer a {
+      color: #666;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    footer a:hover {
+      color: var(--primary-color);
+    }
   </style>
 </head>
 
@@ -526,6 +543,11 @@
         <p>Tags will appear here after generation</p>
       </div>
     </div>
+    
+    <footer>
+      Made with ❤️ by <a href="https://twitter.com/pvnkmrksk" target="_blank">@pvnkmrksk</a> | 
+      <a href="https://github.com/pvnkmrksk/Chukke" target="_blank">GitHub Repository</a>
+    </footer>
   </div>
 
   <script>
@@ -771,6 +793,12 @@
           tileIndex++;
         }
       }
+      
+      // Add attribution text in bottom-right corner
+      const attributionText = "pvnkmrksk.github.io/Chukke";
+      const attributionFontSize = Math.max(2, pageWidth * 0.008); // Scale with page size but not too small
+      svg += `<text x="${pageWidth - pageMargin}" y="${pageHeight - pageMargin / 2}" font-size="${attributionFontSize}" 
+              fill="#cccccc" text-anchor="end" opacity="0.5">${attributionText}</text>`;
 
       svg += `</svg>`;
 
