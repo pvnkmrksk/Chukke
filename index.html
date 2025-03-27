@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unique 2x2 Tag Generator</title>
+  <title>Chukké - Tag Generator</title>
   <!-- Modern Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Simple Color Picker CSS - no external dependencies -->
@@ -304,51 +304,93 @@
     .quadrant-settings {
       margin-bottom: 30px;
     }
+    
+    /* Tooltip styles */
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+    
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: 4px;
+      font-size: 14px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+      z-index: 10;
+      pointer-events: none;
+    }
+    
+    [data-tooltip]:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .help-text {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
     <header>
-      <h1>Unique 2x2 Tag Generator</h1>
-      <p>Create unique identification tags with color quadrants for tracking and identification purposes</p>
+      <h1>ಚುಕ್ಕೆ Chukké - Colourful Unique Tag Generator</h1>
+      <p>Create unique identification tags with color quadrants for tracking and identification purposes. Chukké ಚುಕ್ಕೆ means "dots" or "marks" in Kannada, which perfectly represents this tool's purpose: creating unique visual identification tags for tracking or marking items.</p>
     </header>
     
     <div class="card">
+      <h2>How It Works</h2>
+      <p class="help-text">
+        Chukké generates unique 2×2 color quadrant tags. Each tag maps to a unique identification number using a base-4 system. 
+        The four colors you select become the "alphabet" for your tags. Tags include orientation markers to help identify their proper orientation.
+      </p>
+      
       <h2>Quadrant Settings</h2>
       <div class="quadrant-settings">
         <div class="grid-4col">
           <div class="form-group">
-            <label for="letterTL">Top-Left Letter:</label>
-            <input type="text" id="letterTL" value="C" maxlength="1">
-            <div class="color-picker" id="pickerTL">
+            <label for="letterTL" data-tooltip="Letter displayed in top-left quadrant">Top-Left Letter:</label>
+            <input type="text" id="letterTL" value="C" maxlength="1" title="Single letter to identify the top-left quadrant">
+            <div class="color-picker" id="pickerTL" title="Color for the top-left quadrant">
               <input type="color" id="colorTL" value="#00FFFF" class="color-picker-input">
               <div class="color-display" style="background-color: #00FFFF;">C</div>
             </div>
           </div>
           
           <div class="form-group">
-            <label for="letterTR">Top-Right Letter:</label>
-            <input type="text" id="letterTR" value="M" maxlength="1">
-            <div class="color-picker" id="pickerTR">
+            <label for="letterTR" data-tooltip="Letter displayed in top-right quadrant">Top-Right Letter:</label>
+            <input type="text" id="letterTR" value="M" maxlength="1" title="Single letter to identify the top-right quadrant">
+            <div class="color-picker" id="pickerTR" title="Color for the top-right quadrant">
               <input type="color" id="colorTR" value="#FF00FF" class="color-picker-input">
               <div class="color-display" style="background-color: #FF00FF;">M</div>
             </div>
           </div>
           
           <div class="form-group">
-            <label for="letterBL">Bottom-Left Letter:</label>
-            <input type="text" id="letterBL" value="Y" maxlength="1">
-            <div class="color-picker" id="pickerBL">
+            <label for="letterBL" data-tooltip="Letter displayed in bottom-left quadrant">Bottom-Left Letter:</label>
+            <input type="text" id="letterBL" value="Y" maxlength="1" title="Single letter to identify the bottom-left quadrant">
+            <div class="color-picker" id="pickerBL" title="Color for the bottom-left quadrant">
               <input type="color" id="colorBL" value="#FFFF00" class="color-picker-input">
               <div class="color-display" style="background-color: #FFFF00;">Y</div>
             </div>
           </div>
           
           <div class="form-group">
-            <label for="letterBR">Bottom-Right Letter:</label>
-            <input type="text" id="letterBR" value="K" maxlength="1">
-            <div class="color-picker" id="pickerBR">
+            <label for="letterBR" data-tooltip="Letter displayed in bottom-right quadrant">Bottom-Right Letter:</label>
+            <input type="text" id="letterBR" value="K" maxlength="1" title="Single letter to identify the bottom-right quadrant">
+            <div class="color-picker" id="pickerBR" title="Color for the bottom-right quadrant">
               <input type="color" id="colorBR" value="#000000" class="color-picker-input">
               <div class="color-display" style="background-color: #000000;">K</div>
             </div>
@@ -359,8 +401,8 @@
       <h2>Canvas Settings</h2>
       <div class="grid-2col">
         <div class="form-group">
-          <label for="canvasSize">Canvas Size:</label>
-          <select id="canvasSize" onchange="toggleCustomCanvas()">
+          <label for="canvasSize" data-tooltip="Select standard paper size or custom">Canvas Size:</label>
+          <select id="canvasSize" onchange="toggleCustomCanvas()" title="Standard paper sizes or custom dimensions">
             <option value="A4">A4 (210×297mm)</option>
             <option value="Letter">Letter (216×279mm)</option>
             <option value="A3">A3 (297×420mm)</option>
@@ -373,28 +415,20 @@
           <div id="customCanvas">
             <div class="grid-2col">
               <div class="form-group">
-                <label for="customWidth">Width (mm):</label>
+                <label for="customWidth" data-tooltip="Custom canvas width in millimeters">Width (mm):</label>
                 <div class="slider-group">
-                  <input type="range" id="customWidthSlider" min="10" max="500" value="100" step="1">
-                  <input type="number" id="customWidth" value="100" min="10" step="1">
+                  <input type="range" id="customWidthSlider" min="10" max="500" value="100" step="1" title="Adjust canvas width">
+                  <input type="number" id="customWidth" value="100" min="10" step="1" title="Custom canvas width in millimeters">
                 </div>
               </div>
               <div class="form-group">
-                <label for="customHeight">Height (mm):</label>
+                <label for="customHeight" data-tooltip="Custom canvas height in millimeters">Height (mm):</label>
                 <div class="slider-group">
-                  <input type="range" id="customHeightSlider" min="10" max="500" value="100" step="1">
-                  <input type="number" id="customHeight" value="100" min="10" step="1">
+                  <input type="range" id="customHeightSlider" min="10" max="500" value="100" step="1" title="Adjust canvas height">
+                  <input type="number" id="customHeight" value="100" min="10" step="1" title="Custom canvas height in millimeters">
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="markerColor">Marker Color:</label>
-          <div class="color-picker" id="pickerMarker">
-            <input type="color" id="markerColor" value="#FF0000" class="color-picker-input">
-            <div class="color-display" style="background-color: #FF0000;">Marker</div>
           </div>
         </div>
       </div>
@@ -403,78 +437,86 @@
       <div class="grid-2col">
         <div>
           <div class="form-group">
-            <label for="tileSize">Tile Size (mm):</label>
+            <label for="tileSize" data-tooltip="Size of each individual tag in millimeters">Tile Size (mm):</label>
             <div class="slider-group">
-              <input type="range" id="tileSizeSlider" min="5" max="50" value="20" step="1">
-              <input type="number" id="tileSize" value="20" min="5" max="50" step="1">
+              <input type="range" id="tileSizeSlider" min="5" max="50" value="20" step="1" title="Adjust the size of each tag">
+              <input type="number" id="tileSize" value="20" min="5" max="50" step="1" title="Size of each tag in millimeters">
             </div>
           </div>
           
           <div class="form-group">
-            <label for="tileMargin">Tile Margin (mm):</label>
+            <label for="tileMargin" data-tooltip="Space between tags in millimeters">Tile Margin (mm):</label>
             <div class="slider-group">
-              <input type="range" id="tileMarginSlider" min="0" max="20" value="5" step="1">
-              <input type="number" id="tileMargin" value="5" min="0" max="20" step="1">
+              <input type="range" id="tileMarginSlider" min="0" max="20" value="5" step="1" title="Adjust the margin between tags">
+              <input type="number" id="tileMargin" value="5" min="0" max="20" step="1" title="Space between tags in millimeters">
             </div>
           </div>
           
           <div class="form-group">
-            <label for="linePadding">Line Padding (% of tile):</label>
+            <label for="linePadding" data-tooltip="Size of the orientation line as percentage of tile">Line Padding (% of tile):</label>
             <div class="slider-group">
-              <input type="range" id="linePaddingSlider" min="1" max="50" value="10" step="1">
-              <input type="number" id="linePadding" value="10" min="1" max="50" step="1">
+              <input type="range" id="linePaddingSlider" min="1" max="50" value="10" step="1" title="Adjust the thickness of the orientation line">
+              <input type="number" id="linePadding" value="10" min="1" max="50" step="1" title="Size of orientation line as percentage of tile size">
             </div>
           </div>
         </div>
         
         <div>
           <div class="form-group">
-            <label for="tileRows">Number of Rows:</label>
+            <label for="tileRows" data-tooltip="Number of rows in the generated sheet">Number of Rows:</label>
             <div class="slider-group">
-              <input type="range" id="tileRowsSlider" min="1" max="30" value="10" step="1">
-              <input type="number" id="tileRows" value="10" min="1" max="30" step="1">
+              <input type="range" id="tileRowsSlider" min="1" max="30" value="10" step="1" title="Adjust the number of rows">
+              <input type="number" id="tileRows" value="10" min="1" max="30" step="1" title="Number of rows in the generated sheet">
             </div>
           </div>
           
           <div class="form-group">
-            <label for="tileCols">Number of Columns:</label>
+            <label for="tileCols" data-tooltip="Number of columns in the generated sheet">Number of Columns:</label>
             <div class="slider-group">
-              <input type="range" id="tileColsSlider" min="1" max="20" value="5" step="1">
-              <input type="number" id="tileCols" value="5" min="1" max="20" step="1">
+              <input type="range" id="tileColsSlider" min="1" max="20" value="5" step="1" title="Adjust the number of columns">
+              <input type="number" id="tileCols" value="5" min="1" max="20" step="1" title="Number of columns in the generated sheet">
             </div>
           </div>
           
           <div class="form-group">
-            <label for="startSeq">Start Sequence Number:</label>
+            <label for="startSeq" data-tooltip="First ID number to start the sequence">Start Sequence Number:</label>
             <div class="slider-group">
-              <input type="range" id="startSeqSlider" min="0" max="100" value="1" step="1">
-              <input type="number" id="startSeq" value="1" min="0" step="1">
+              <input type="range" id="startSeqSlider" min="0" max="100" value="1" step="1" title="Adjust the starting ID number">
+              <input type="number" id="startSeq" value="1" min="0" step="1" title="First ID number to use in the sequence">
             </div>
           </div>
         </div>
       </div>
       
-      <h2>Marker Options</h2>
+      <h2>Orientation Markers</h2>
       <div class="form-group">
-        <div class="checkbox-group">
-          <input type="checkbox" id="includeNotch" checked>
-          <label for="includeNotch">Include Corner Notch</label>
+        <div class="form-group">
+          <label for="markerColor" data-tooltip="Color for the orientation markers">Orientation Marker Color:</label>
+          <div class="color-picker" id="pickerMarker" title="Color for the orientation markers (notch and bottom line)">
+            <input type="color" id="markerColor" value="#FF0000" class="color-picker-input">
+            <div class="color-display" style="background-color: #FF0000;">Marker</div>
+          </div>
         </div>
         
         <div class="checkbox-group">
-          <input type="checkbox" id="includeLine" checked>
-          <label for="includeLine">Include Bottom Line</label>
+          <input type="checkbox" id="includeNotch" checked title="Add a triangular notch in the top-left corner">
+          <label for="includeNotch" data-tooltip="Add a triangular notch in the top-left corner">Include Corner Notch</label>
         </div>
         
         <div class="checkbox-group">
-          <input type="checkbox" id="showText" checked>
-          <label for="showText">Show Text Label</label>
+          <input type="checkbox" id="includeLine" checked title="Add a line below the tag to indicate orientation">
+          <label for="includeLine" data-tooltip="Add a line below the tag to indicate orientation">Include Bottom Line</label>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="showText" checked title="Display the ID code and number below the tag">
+          <label for="showText" data-tooltip="Display the ID code and number below the tag">Show Text Label</label>
         </div>
       </div>
       
       <div class="button-group">
-        <button onclick="generateSVG()">Generate Tags</button>
-        <button onclick="downloadSVG()" class="button-secondary">Download SVG</button>
+        <button onclick="generateSVG()" title="Generate tags with the current settings">Generate Tags</button>
+        <button onclick="downloadSVG()" class="button-secondary" title="Download generated tags as an SVG file">Download SVG</button>
       </div>
     </div>
     
@@ -639,10 +681,10 @@
       const thickness = includeLine ? tileSize * (linePad / 100) : 0;
 
       // Space between the bottom of any marker and the text
-      const textGap = tileSize * 0.20;
+      const textGap = tileSize * 0.05;
 
       // The total vertical space for markers & text below the tile
-      const markerSpace = includeLine ? (gap + thickness + textGap) : textGap;
+      const markerSpace = includeLine ? (gap + thickness + (showText ? textGap : 0)) : (showText ? textGap : 0);
 
       // Cell dimensions
       const cellWidth  = tileSize + tileMargin;
@@ -711,11 +753,18 @@
           // Dynamic font size so text doesn't bleed at small tile sizes
           const fontSize = Math.max(3, tileSize * 0.12);
 
-          // Place text below markers
+          // Place text below markers - improved positioning with better responsiveness to tile size
           if (showText) {
-            const yText = tileSize + (includeLine ? (gap + thickness) : 0) + textGap + fontSize * 0.8;
-            // Slight left offset so text isn't flush against the left
-            svg += `<text x="5" y="${yText}" font-size="${fontSize}" fill="#333">${labelText}</text>`;
+            // Calculate the proper y-position based on marker existence
+            const yText = tileSize + (includeLine ? (gap + thickness + textGap) : textGap) + fontSize * 0.3;
+            
+            // Create a background rectangle for better text visibility
+            const textWidth = labelText.length * fontSize * 0.65; // approx width calculation
+            const textHeight = fontSize * 1.2;
+            const textX = 0;
+            
+            // Add text with proper alignment that stays within the marker width
+            svg += `<text x="${textX}" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start">${labelText}</text>`;
           }
 
           svg += `</g>`; // end tile group
@@ -742,7 +791,7 @@
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = 'unique_tags.svg';
+      a.download = 'Chukké_tags.svg';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
