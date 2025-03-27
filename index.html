@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Unique 2x2 Tag Generator</title>
+  <!-- Modern Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0; 
+      padding: 0; 
+      background: #f7f7f7; 
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #444;
+      margin-top: 0;
+    }
+    p {
+      line-height: 1.4;
+    }
+    .section {
+      margin-bottom: 24px;
+    }
+    /* Use CSS grid for a cleaner form layout */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    label {
+      margin-bottom: 8px;
+      display: block;
+      font-weight: 500;
+    }
+    input[type="number"],
+    input[type="text"],
+    select,
+    input[type="color"] {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 4px;
+      font-family: 'Roboto', sans-serif;
+    }
+    /* Buttons */
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #007BFF;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-right: 10px;
+      font-size: 0.95rem;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #svgContainer {
+      margin-top: 20px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    /* Hide custom canvas fields by default */
+    #customCanvas {
+      display: none;
+    }
+  </style>
+  <script>
+    // Show/hide custom canvas fields
+    function toggleCustomCanvas() {
+      const canvasSelect = document.getElementById("canvasSize").value;
+      document.getElementById("customCanvas").style.display = 
+        (canvasSelect === "Custom") ? "block" : "none";
+    }
+
+    // Convert an integer to a 4-digit base-4 string
+    function toBase4(num) {
+      let code = num.toString(4);
+      while (code.length < 4) {
+        code = "0" + code;
+      }
+      return code;
+    }
+
+    function generateSVG() {
+      // Quadrant mappings (top-left, top-right, bottom-left, bottom-right)
+      const letterTL = document.getElementById('letterTL').value || 'C';
+      const colorTL  = document.getElementById('colorTL').value;
+      const letterTR = document.getElementById('letterTR').value || 'M';
+      const colorTR  = document.getElementById('colorTR').value;
+      const letterBL = document.getElementById('letterBL').value || 'Y';
+      const colorBL  = document.getElementById('colorBL').value;
+      const letterBR = document.getElementById('letterBR').value || 'K';
+      const colorBR  = document.getElementById('colorBR').value;
+
+      // We'll store them in an array, index 0=top-left, 1=top-right, 2=bottom-left, 3=bottom-right
+      // This matches the base-4 digit positions we use later.
+      const mappings = [
+        { letter: letterTL, color: colorTL },
+        { letter: letterTR, color: colorTR },
+        { letter: letterBL, color: colorBL },
+        { letter: letterBR, color: colorBR }
+      ];
+
+      // Canvas selection
+      let canvasOption = document.getElementById('canvasSize').value;
+      let pageWidth, pageHeight;
+      switch (canvasOption) {
+        case "A4":
+          pageWidth = 210; pageHeight = 297; break;
+        case "Letter":
+          pageWidth = 216; pageHeight = 279; break;
+        case "A3":
+          pageWidth = 297; pageHeight = 420; break;
+        case "A5":
+          pageWidth = 148; pageHeight = 210; break;
+        case "A6":
+          pageWidth = 105; pageHeight = 148; break;
+        case "4x6":
+          pageWidth = 101.6; pageHeight = 152.4; break;
+        case "Custom":
+          pageWidth  = parseFloat(document.getElementById('customWidth').value);
+          pageHeight = parseFloat(document.getElementById('customHeight').value);
+          break;
+        default:
+          pageWidth = 210; pageHeight = 297;
+      }
+
+      // Tile & layout settings
+      const tileSize  = parseFloat(document.getElementById('tileSize').value);
+      const tileMargin= parseFloat(document.getElementById('tileMargin').value);
+      const rows      = parseInt(document.getElementById('tileRows').value);
+      const cols      = parseInt(document.getElementById('tileCols').value);
+      const linePad   = parseFloat(document.getElementById('linePadding').value);
+      const startSeq  = parseInt(document.getElementById('startSeq').value);
+
+      // Marker options
+      const includeNotch  = document.getElementById('includeNotch').checked;
+      const includeLine   = document.getElementById('includeLine').checked;
+      const showText      = document.getElementById('showText').checked;
+      const markerColor   = document.getElementById('markerColor').value;
+
+      // Compute horizontal line gap & thickness as a fraction of tileSize
+      const gap       = includeLine ? tileSize * (linePad / 100) : 0;
+      const thickness = includeLine ? tileSize * (linePad / 100) : 0;
+
+      // Space between the bottom of any marker and the text
+      const textGap = tileSize * 0.20;
+
+      // The total vertical space for markers & text below the tile
+      const markerSpace = includeLine ? (gap + thickness + textGap) : textGap;
+
+      // Cell dimensions
+      const cellWidth  = tileSize + tileMargin;
+      const cellHeight = tileSize + markerSpace + tileMargin;
+
+      // Page margin
+      const pageMargin = 10;
+      const startX = pageMargin;
+      const startY = pageMargin;
+
+      // Start building the SVG
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${pageWidth}mm" height="${pageHeight}mm" viewBox="0 0 ${pageWidth} ${pageHeight}">`;
+      // Optional dashed border around the page
+      svg += `<rect x="0" y="0" width="${pageWidth}" height="${pageHeight}" fill="white" stroke="#ccc" stroke-dasharray="2,2" />`;
+
+      // Generate each tile
+      let tileIndex = 0;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          // Position of this tile
+          const tileX = startX + c * cellWidth;
+          const tileY = startY + r * cellHeight;
+
+          // Convert (startSeq - 1 + tileIndex) to a 4-digit base-4 code
+          const baseValue = startSeq - 1 + tileIndex;
+          const codeDigits = toBase4(baseValue);
+
+          // Build the 4-letter code (e.g. "CMYK")
+          let codeLetters = "";
+          for (let d = 0; d < 4; d++) {
+            const digit = parseInt(codeDigits[d]);
+            codeLetters += mappings[digit].letter;
+          }
+
+          // Sequence number
+          const overallNumber = startSeq + tileIndex;
+          const labelText = codeLetters + " - " + overallNumber;
+
+          // Start a group for the tile
+          svg += `<g transform="translate(${tileX},${tileY})">`;
+
+          // 2x2 quadrants
+          const half = tileSize / 2;
+          // codeDigits[0] => top-left, codeDigits[1] => top-right, etc.
+          const digitTL = parseInt(codeDigits[0]);
+          const digitTR = parseInt(codeDigits[1]);
+          const digitBL = parseInt(codeDigits[2]);
+          const digitBR = parseInt(codeDigits[3]);
+
+          svg += `<rect x="0"     y="0"      width="${half}" height="${half}" fill="${mappings[digitTL].color}" />`;
+          svg += `<rect x="${half}" y="0"      width="${half}" height="${half}" fill="${mappings[digitTR].color}" />`;
+          svg += `<rect x="0"     y="${half}" width="${half}" height="${half}" fill="${mappings[digitBL].color}" />`;
+          svg += `<rect x="${half}" y="${half}" width="${half}" height="${half}" fill="${mappings[digitBR].color}" />`;
+
+          // Notch marker (top-left corner)
+          if (includeNotch) {
+            const notchSize = tileSize / 4;
+            svg += `<polygon points="0,0 ${notchSize},0 0,${notchSize}" fill="${markerColor}" />`;
+          }
+
+          // Horizontal line marker
+          if (includeLine) {
+            svg += `<line x1="0" y1="${tileSize + gap}" x2="${tileSize}" y2="${tileSize + gap}" stroke="${markerColor}" stroke-width="${thickness}" />`;
+          }
+
+          // Dynamic font size so text doesn't bleed at small tile sizes
+          const fontSize = Math.max(3, tileSize * 0.12);
+
+          // Place text below markers
+          if (showText) {
+            const yText = tileSize + (includeLine ? (gap + thickness) : 0) + textGap + fontSize * 0.8;
+            // Slight left offset so text isn't flush against the left
+            svg += `<text x="5" y="${yText}" font-size="${fontSize}" fill="#333">${labelText}</text>`;
+          }
+
+          svg += `</g>`; // end tile group
+          tileIndex++;
+        }
+      }
+
+      svg += `</svg>`;
+
+      // Show in preview
+      document.getElementById('svgContainer').innerHTML = svg;
+      window.generatedSVG = svg;
+    }
+
+    function downloadSVG() {
+      if (!window.generatedSVG) {
+        alert("Please generate the SVG first.");
+        return;
+      }
+      const blob = new Blob([window.generatedSVG], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+
+      // Create a hidden link, click it, then remove it
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'unique_tags.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
