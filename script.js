@@ -229,6 +229,9 @@ function generateSVG() {
   // Optional dashed border around the page
   svg += `<rect x="0" y="0" width="${pageWidth}" height="${pageHeight}" fill="white" stroke="#ccc" stroke-dasharray="2,2" />`;
 
+  // Store tag SVGs for PNG export
+  window.tagSVGs = [];
+
   // Generate each tile
   let tileIndex = 0;
   let tilesGenerated = 0;
@@ -321,20 +324,6 @@ function generateSVG() {
         // Always show the full text, but adjust for small sizes if needed
         let displayText = labelText;
         
-        // For very small tiles, we may want to show just the code letters
-        // to increase readability, but if user wants all text, we keep it
-        /*
-        if (tileSize < 8) {
-          displayText = codeLetters;
-        }
-        
-        // For extremely tiny tiles, hide text completely
-        if (tileSize < 4) {
-          useTextLength = false; 
-          displayText = "";
-        }
-        */
-        
         // Add text with proper alignment that stays within the marker width
         // Only constrain text width if necessary, not by default
         svg += `<text x="0" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start">${displayText}</text>`;
@@ -348,6 +337,31 @@ function generateSVG() {
       }
 
       svg += `</g>`; // end tile group
+      
+      // Store individual tag SVG for PNG export
+      const individualSVG = generateIndividualTagSVG(
+        tileSize, 
+        colorMappings[digitTL].color,
+        colorMappings[digitTR].color,
+        colorMappings[digitBL].color,
+        colorMappings[digitBR].color,
+        markerColor,
+        includeNotch,
+        includeLine,
+        thickness,
+        gap,
+        showText,
+        codeLetters,
+        overallNumber,
+        fontSize,
+        textGap
+      );
+      window.tagSVGs.push({
+        svg: individualSVG,
+        id: overallNumber,
+        codeLetters: codeLetters
+      });
+      
       tileIndex++;
       tilesGenerated++;
     }
@@ -364,6 +378,56 @@ function generateSVG() {
   // Show in preview
   document.getElementById('svgContainer').innerHTML = svg;
   window.generatedSVG = svg;
+}
+
+// Generate SVG for a single tag (for PNG export)
+function generateIndividualTagSVG(
+  tileSize, colorTL, colorTR, colorBL, colorBR, 
+  markerColor, includeNotch, includeLine, thickness, gap, 
+  showText, codeLetters, tagNumber, fontSize, textGap
+) {
+  // Add 10% padding to the edges
+  const padding = tileSize * 0.1;
+  const fullSize = tileSize + (padding * 2);
+  
+  // For text, add extra space at the bottom
+  const textHeight = fontSize * 1.2; 
+  const textSpace = showText ? textHeight + textGap : 0;
+  const totalHeight = fullSize + (includeLine ? gap + thickness : 0) + textSpace;
+  
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${fullSize}" height="${totalHeight}" viewBox="0 0 ${fullSize} ${totalHeight}">`;
+  
+  // Background
+  svg += `<rect x="0" y="0" width="${fullSize}" height="${totalHeight}" fill="white"/>`;
+  
+  // Main tag with 10% padding
+  const half = tileSize / 2;
+  svg += `<rect x="${padding}" y="${padding}" width="${half}" height="${half}" fill="${colorTL}" />`;
+  svg += `<rect x="${padding + half}" y="${padding}" width="${half}" height="${half}" fill="${colorTR}" />`;
+  svg += `<rect x="${padding}" y="${padding + half}" width="${half}" height="${half}" fill="${colorBL}" />`;
+  svg += `<rect x="${padding + half}" y="${padding + half}" width="${half}" height="${half}" fill="${colorBR}" />`;
+  
+  // Notch marker (top-left corner)
+  if (includeNotch) {
+    const notchSize = tileSize / 4;
+    svg += `<polygon points="${padding},${padding} ${padding + notchSize},${padding} ${padding},${padding + notchSize}" fill="${markerColor}" />`;
+  }
+  
+  // Horizontal line marker
+  if (includeLine) {
+    svg += `<line x1="${padding}" y1="${padding + tileSize + gap}" x2="${padding + tileSize}" y2="${padding + tileSize + gap}" 
+            stroke="${markerColor}" stroke-width="${thickness}" />`;
+  }
+  
+  // Text
+  if (showText) {
+    const yText = padding + tileSize + (includeLine ? gap + thickness + textGap : textGap) + textHeight;
+    const labelText = `${codeLetters} - ${tagNumber}`;
+    svg += `<text x="${padding}" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start">${labelText}</text>`;
+  }
+  
+  svg += `</svg>`;
+  return svg;
 }
 
 function downloadSVG() {
@@ -383,4 +447,106 @@ function downloadSVG() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// Download all tags as individual PNG files
+async function downloadPNGs() {
+  if (!window.tagSVGs || window.tagSVGs.length === 0) {
+    alert("Please generate the tags first.");
+    return;
+  }
+  
+  // Show progress indicator
+  const svgContainer = document.getElementById('svgContainer');
+  const progressElement = document.createElement('div');
+  progressElement.className = 'progress-message';
+  progressElement.innerHTML = `<p>Preparing PNG files for download...</p>`;
+  svgContainer.appendChild(progressElement);
+  
+  // Find the highest ID to determine padding length
+  const maxId = Math.max(...window.tagSVGs.map(tag => tag.id));
+  const paddingLength = maxId.toString().length;
+  
+  // Convert SVGs to PNGs
+  const pngPromises = window.tagSVGs.map((tag, index) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = function() {
+        // Create canvas to draw the image
+        const canvas = document.createElement('canvas');
+        const minSize = 256; // Minimum size for the PNG files
+        
+        // Calculate size while maintaining aspect ratio
+        const svgWidth = img.width;
+        const svgHeight = img.height;
+        const aspectRatio = svgWidth / svgHeight;
+        
+        let canvasWidth, canvasHeight;
+        if (aspectRatio >= 1) {
+          // Wider than tall
+          canvasWidth = Math.max(minSize, svgWidth);
+          canvasHeight = canvasWidth / aspectRatio;
+        } else {
+          // Taller than wide
+          canvasHeight = Math.max(minSize, svgHeight);
+          canvasWidth = canvasHeight * aspectRatio;
+        }
+        
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw the SVG image onto the canvas, maintaining aspect ratio
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Convert to PNG
+        const pngUrl = canvas.toDataURL('image/png');
+        resolve({
+          url: pngUrl,
+          id: tag.id,
+          codeLetters: tag.codeLetters
+        });
+      };
+      
+      // Create a data URL from the SVG
+      const blob = new Blob([tag.svg], {type: 'image/svg+xml'});
+      const url = URL.createObjectURL(blob);
+      img.src = url;
+    });
+  });
+  
+  // Wait for all PNGs to be created
+  const pngs = await Promise.all(pngPromises);
+  
+  // Update progress
+  progressElement.innerHTML = `<p>Downloading ${pngs.length} PNG files...</p>`;
+  
+  // Download each PNG
+  for (let i = 0; i < pngs.length; i++) {
+    const png = pngs[i];
+    const a = document.createElement('a');
+    a.href = png.url;
+    // Pad ID with leading zeros for proper sorting
+    const paddedId = png.id.toString().padStart(paddingLength, '0');
+    a.download = `Chukke_${paddedId}_${png.codeLetters}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    // Add a small delay between downloads to prevent browser issues
+    if (i < pngs.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    progressElement.innerHTML = `<p>Downloading: ${i + 1} of ${pngs.length} files...</p>`;
+  }
+  
+  // Download complete
+  progressElement.innerHTML = `<p>Download complete! ${pngs.length} PNG files have been saved.</p>`;
+  setTimeout(() => {
+    progressElement.remove();
+  }, 5000);
 } 
