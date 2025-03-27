@@ -357,6 +357,10 @@
     footer a:hover {
       color: var(--primary-color);
     }
+    
+    #colorFields {
+      margin-top: 15px;
+    }
   </style>
 </head>
 
@@ -370,48 +374,25 @@
     <div class="card">
       <h2>How It Works</h2>
       <p class="help-text">
-        Chukké generates unique 2×2 color quadrant tags. Each tag maps to a unique identification number using a base-4 system. 
-        The four colors you select become the "alphabet" for your tags. Tags include orientation markers to help identify their proper orientation.
+        Chukké generates unique 2×2 color quadrant tags. Each tag maps to a unique identification number using a base-n system. 
+        The colors you select become the "alphabet" for your tags. Tags include orientation markers to help identify their proper orientation.
       </p>
       
-      <h2>Quadrant Settings</h2>
+      <h2>Color Settings</h2>
+      <div class="form-group">
+        <label for="numColors" data-tooltip="Number of unique colors to use in your tags">Number of Colors:</label>
+        <div class="slider-group">
+          <input type="range" id="numColorsSlider" min="2" max="8" value="4" step="1" title="Adjust the number of colors">
+          <input type="number" id="numColors" value="4" min="2" max="8" step="1" title="Number of unique colors to use">
+        </div>
+        <p class="help-text">
+          With <span id="colorCountDisplay">4</span> colors, you can create up to <span id="maxTagsDisplay">256</span> unique tags.
+        </p>
+      </div>
+      
       <div class="quadrant-settings">
-        <div class="grid-4col">
-          <div class="form-group">
-            <label for="letterTL" data-tooltip="Letter displayed in top-left quadrant">Top-Left Letter:</label>
-            <input type="text" id="letterTL" value="C" maxlength="1" title="Single letter to identify the top-left quadrant">
-            <div class="color-picker" id="pickerTL" title="Color for the top-left quadrant">
-              <input type="color" id="colorTL" value="#00FFFF" class="color-picker-input">
-              <div class="color-display" style="background-color: #00FFFF;">C</div>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="letterTR" data-tooltip="Letter displayed in top-right quadrant">Top-Right Letter:</label>
-            <input type="text" id="letterTR" value="M" maxlength="1" title="Single letter to identify the top-right quadrant">
-            <div class="color-picker" id="pickerTR" title="Color for the top-right quadrant">
-              <input type="color" id="colorTR" value="#FF00FF" class="color-picker-input">
-              <div class="color-display" style="background-color: #FF00FF;">M</div>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="letterBL" data-tooltip="Letter displayed in bottom-left quadrant">Bottom-Left Letter:</label>
-            <input type="text" id="letterBL" value="Y" maxlength="1" title="Single letter to identify the bottom-left quadrant">
-            <div class="color-picker" id="pickerBL" title="Color for the bottom-left quadrant">
-              <input type="color" id="colorBL" value="#FFFF00" class="color-picker-input">
-              <div class="color-display" style="background-color: #FFFF00;">Y</div>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="letterBR" data-tooltip="Letter displayed in bottom-right quadrant">Bottom-Right Letter:</label>
-            <input type="text" id="letterBR" value="K" maxlength="1" title="Single letter to identify the bottom-right quadrant">
-            <div class="color-picker" id="pickerBR" title="Color for the bottom-right quadrant">
-              <input type="color" id="colorBR" value="#000000" class="color-picker-input">
-              <div class="color-display" style="background-color: #000000;">K</div>
-            </div>
-          </div>
+        <div id="colorFields" class="grid-4col">
+          <!-- Color fields will be generated dynamically -->
         </div>
       </div>
       
@@ -456,16 +437,16 @@
           <div class="form-group">
             <label for="tileSize" data-tooltip="Size of each individual tag in millimeters">Tile Size (mm):</label>
             <div class="slider-group">
-              <input type="range" id="tileSizeSlider" min="0.5" max="50" value="20" step="1" title="Adjust the size of each tag">
-              <input type="number" id="tileSize" value="20" min="0.5" max="50" step="1" title="Size of each tag in millimeters">
+              <input type="range" id="tileSizeSlider" min="0.5" max="50" value="20" step="0.5" title="Adjust the size of each tag">
+              <input type="number" id="tileSize" value="20" min="0.5" max="50" step="0.5" title="Size of each tag in millimeters">
             </div>
           </div>
           
           <div class="form-group">
             <label for="tileMargin" data-tooltip="Space between tags in millimeters">Tile Margin (mm):</label>
             <div class="slider-group">
-              <input type="range" id="tileMarginSlider" min="0" max="20" value="5" step="1" title="Adjust the margin between tags">
-              <input type="number" id="tileMargin" value="5" min="0" max="20" step="1" title="Space between tags in millimeters">
+              <input type="range" id="tileMarginSlider" min="0" max="20" value="5" step="0.5" title="Adjust the margin between tags">
+              <input type="number" id="tileMargin" value="5" min="0" max="20" step="0.5" title="Space between tags in millimeters">
             </div>
           </div>
           
@@ -498,7 +479,7 @@
           <div class="form-group">
             <label for="startSeq" data-tooltip="First ID number to start the sequence">Start Sequence Number:</label>
             <div class="slider-group">
-              <input type="range" id="startSeqSlider" min="0" max="100" value="1" step="1" title="Adjust the starting ID number">
+              <input type="range" id="startSeqSlider" min="0" max="255" value="1" step="1" title="Adjust the starting ID number">
               <input type="number" id="startSeq" value="1" min="0" step="1" title="First ID number to use in the sequence">
             </div>
           </div>
@@ -551,37 +532,30 @@
   </div>
 
   <script>
+    // Default color configurations
+    const defaultColors = [
+      { letter: 'C', color: '#00FFFF' }, // Cyan
+      { letter: 'M', color: '#FF00FF' }, // Magenta
+      { letter: 'Y', color: '#FFFF00' }, // Yellow
+      { letter: 'K', color: '#000000' }, // Black
+      { letter: 'R', color: '#FF0000' }, // Red
+      { letter: 'G', color: '#00FF00' }, // Green
+      { letter: 'B', color: '#0000FF' }, // Blue
+      { letter: 'W', color: '#FFFFFF' }  // White
+    ];
+    
     // Initialize color pickers and sync with letters
     document.addEventListener('DOMContentLoaded', function() {
-      // Function to setup color picker behavior
-      function setupColorPicker(colorInputId, displaySelector, letterInputId) {
-        const colorInput = document.getElementById(colorInputId);
-        const display = document.querySelector(displaySelector);
-        const letterInput = document.getElementById(letterInputId);
-        
-        // Update display when color changes
-        colorInput.addEventListener('input', function() {
-          display.style.backgroundColor = this.value;
-          // Auto-adjust text color based on background brightness
-          const rgb = hexToRgb(this.value);
-          const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-          display.style.color = brightness > 125 ? '#000000' : '#ffffff';
-        });
-        
-        // Update letter on display when letter input changes
-        if (letterInput) {
-          letterInput.addEventListener('input', function() {
-            display.textContent = this.value || ' ';
-          });
-        }
-      }
+      // Setup number of colors input
+      setupSliderNumberPair('numColorsSlider', 'numColors');
+      document.getElementById('numColors').addEventListener('input', updateColorFields);
+      document.getElementById('numColorsSlider').addEventListener('input', updateColorFields);
       
-      // Setup all color pickers
-      setupColorPicker('colorTL', '#pickerTL .color-display', 'letterTL');
-      setupColorPicker('colorTR', '#pickerTR .color-display', 'letterTR');
-      setupColorPicker('colorBL', '#pickerBL .color-display', 'letterBL');
-      setupColorPicker('colorBR', '#pickerBR .color-display', 'letterBR');
+      // Setup the marker color picker
       setupColorPicker('markerColor', '#pickerMarker .color-display');
+      
+      // Generate initial color fields
+      updateColorFields();
       
       // Setup all slider-number pairs
       setupSliderNumberPair('tileSizeSlider', 'tileSize');
@@ -593,6 +567,82 @@
       setupSliderNumberPair('customWidthSlider', 'customWidth');
       setupSliderNumberPair('customHeightSlider', 'customHeight');
     });
+    
+    // Function to update color fields based on number of colors
+    function updateColorFields() {
+      const numColors = parseInt(document.getElementById('numColors').value);
+      const colorFieldsContainer = document.getElementById('colorFields');
+      const maxTags = Math.pow(numColors, 4);
+      
+      // Update display
+      document.getElementById('colorCountDisplay').textContent = numColors;
+      document.getElementById('maxTagsDisplay').textContent = maxTags;
+      
+      // Update max value for start sequence
+      const startSeqSlider = document.getElementById('startSeqSlider');
+      const startSeqInput = document.getElementById('startSeq');
+      const maxSeq = maxTags - 1;
+      startSeqSlider.max = maxSeq;
+      
+      // If current value exceeds max, adjust it
+      if (parseInt(startSeqInput.value) > maxSeq) {
+        startSeqInput.value = maxSeq;
+        startSeqSlider.value = maxSeq;
+      }
+      
+      // Clear existing fields
+      colorFieldsContainer.innerHTML = '';
+      
+      // Create new color fields
+      for (let i = 0; i < numColors; i++) {
+        const fieldId = `color${i}`;
+        const letterId = `letter${i}`;
+        
+        const fieldHtml = `
+          <div class="form-group">
+            <label for="${letterId}" data-tooltip="Letter for color ${i+1}">Color ${i+1} Letter:</label>
+            <input type="text" id="${letterId}" value="${defaultColors[i].letter}" maxlength="1" title="Single letter to identify this color">
+            <div class="color-picker" id="picker${i}" title="Color ${i+1}">
+              <input type="color" id="${fieldId}" value="${defaultColors[i].color}" class="color-picker-input">
+              <div class="color-display" style="background-color: ${defaultColors[i].color};">${defaultColors[i].letter}</div>
+            </div>
+          </div>
+        `;
+        
+        // Add to container
+        colorFieldsContainer.innerHTML += fieldHtml;
+      }
+      
+      // Initialize the new color pickers
+      for (let i = 0; i < numColors; i++) {
+        setupColorPicker(`color${i}`, `#picker${i} .color-display`, `letter${i}`);
+      }
+    }
+    
+    // Function to setup color picker behavior
+    function setupColorPicker(colorInputId, displaySelector, letterInputId) {
+      const colorInput = document.getElementById(colorInputId);
+      const display = document.querySelector(displaySelector);
+      const letterInput = letterInputId ? document.getElementById(letterInputId) : null;
+      
+      if (!colorInput || !display) return; // In case elements don't exist yet
+      
+      // Update display when color changes
+      colorInput.addEventListener('input', function() {
+        display.style.backgroundColor = this.value;
+        // Auto-adjust text color based on background brightness
+        const rgb = hexToRgb(this.value);
+        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+        display.style.color = brightness > 125 ? '#000000' : '#ffffff';
+      });
+      
+      // Update letter on display when letter input changes
+      if (letterInput) {
+        letterInput.addEventListener('input', function() {
+          display.textContent = this.value || ' ';
+        });
+      }
+    }
     
     // Helper function to convert hex to RGB
     function hexToRgb(hex) {
@@ -613,14 +663,22 @@
       const slider = document.getElementById(sliderId);
       const number = document.getElementById(numberId);
       
+      if (!slider || !number) return; // In case elements don't exist yet
+      
       // Update number when slider changes
       slider.addEventListener('input', function() {
         number.value = this.value;
+        if (numberId === 'numColors') {
+          updateColorFields();
+        }
       });
       
       // Update slider when number changes
       number.addEventListener('input', function() {
         slider.value = this.value;
+        if (numberId === 'numColors') {
+          updateColorFields();
+        }
       });
     }
 
@@ -631,34 +689,39 @@
         (canvasSelect === "Custom") ? "block" : "none";
     }
 
-    // Convert an integer to a 4-digit base-4 string
-    function toBase4(num) {
-      let code = num.toString(4);
-      while (code.length < 4) {
-        code = "0" + code;
+    // Convert an integer to a variable-base string with 4 digits
+    function toBaseN(num, base) {
+      if (base <= 1) base = 2; // Minimum base is 2
+      
+      let result = "";
+      let value = num;
+      
+      // Generate 4 digits
+      for (let i = 0; i < 4; i++) {
+        const digit = value % base;
+        result = digit + result;
+        value = Math.floor(value / base);
       }
-      return code;
+      
+      // Pad with leading zeros if needed
+      while (result.length < 4) {
+        result = "0" + result;
+      }
+      
+      return result;
     }
 
     function generateSVG() {
-      // Quadrant mappings (top-left, top-right, bottom-left, bottom-right)
-      const letterTL = document.getElementById('letterTL').value || 'C';
-      const colorTL  = document.getElementById('colorTL').value;
-      const letterTR = document.getElementById('letterTR').value || 'M';
-      const colorTR  = document.getElementById('colorTR').value;
-      const letterBL = document.getElementById('letterBL').value || 'Y';
-      const colorBL  = document.getElementById('colorBL').value;
-      const letterBR = document.getElementById('letterBR').value || 'K';
-      const colorBR  = document.getElementById('colorBR').value;
-
-      // We'll store them in an array, index 0=top-left, 1=top-right, 2=bottom-left, 3=bottom-right
-      // This matches the base-4 digit positions we use later.
-      const mappings = [
-        { letter: letterTL, color: colorTL },
-        { letter: letterTR, color: colorTR },
-        { letter: letterBL, color: colorBL },
-        { letter: letterBR, color: colorBR }
-      ];
+      // Get number of colors
+      const numColors = parseInt(document.getElementById('numColors').value);
+      
+      // Collect all color mappings
+      const colorMappings = [];
+      for (let i = 0; i < numColors; i++) {
+        const letter = document.getElementById(`letter${i}`).value || defaultColors[i].letter;
+        const color = document.getElementById(`color${i}`).value;
+        colorMappings.push({ letter, color });
+      }
 
       // Canvas selection
       let canvasOption = document.getElementById('canvasSize').value;
@@ -730,19 +793,23 @@
           const tileX = startX + c * cellWidth;
           const tileY = startY + r * cellHeight;
 
-          // Convert (startSeq - 1 + tileIndex) to a 4-digit base-4 code
-          const baseValue = startSeq - 1 + tileIndex;
-          const codeDigits = toBase4(baseValue);
+          // Convert (startSeq + tileIndex) to a base-n code
+          const baseValue = startSeq + tileIndex;
+          const codeDigits = toBaseN(baseValue, numColors);
 
-          // Build the 4-letter code (e.g. "CMYK")
+          // Build the letter code based on color mappings
           let codeLetters = "";
           for (let d = 0; d < 4; d++) {
             const digit = parseInt(codeDigits[d]);
-            codeLetters += mappings[digit].letter;
+            if (digit < numColors) {
+              codeLetters += colorMappings[digit].letter;
+            } else {
+              codeLetters += "?"; // Fallback for invalid digits
+            }
           }
 
           // Sequence number
-          const overallNumber = startSeq + tileIndex;
+          const overallNumber = baseValue;
           const labelText = codeLetters + " - " + overallNumber;
 
           // Start a group for the tile
@@ -756,10 +823,10 @@
           const digitBL = parseInt(codeDigits[2]);
           const digitBR = parseInt(codeDigits[3]);
 
-          svg += `<rect x="0"     y="0"      width="${half}" height="${half}" fill="${mappings[digitTL].color}" />`;
-          svg += `<rect x="${half}" y="0"      width="${half}" height="${half}" fill="${mappings[digitTR].color}" />`;
-          svg += `<rect x="0"     y="${half}" width="${half}" height="${half}" fill="${mappings[digitBL].color}" />`;
-          svg += `<rect x="${half}" y="${half}" width="${half}" height="${half}" fill="${mappings[digitBR].color}" />`;
+          svg += `<rect x="0"     y="0"      width="${half}" height="${half}" fill="${colorMappings[digitTL].color}" />`;
+          svg += `<rect x="${half}" y="0"      width="${half}" height="${half}" fill="${colorMappings[digitTR].color}" />`;
+          svg += `<rect x="0"     y="${half}" width="${half}" height="${half}" fill="${colorMappings[digitBL].color}" />`;
+          svg += `<rect x="${half}" y="${half}" width="${half}" height="${half}" fill="${colorMappings[digitBR].color}" />`;
 
           // Notch marker (top-left corner)
           if (includeNotch) {
@@ -772,21 +839,22 @@
             svg += `<line x1="0" y1="${tileSize + gap}" x2="${tileSize}" y2="${tileSize + gap}" stroke="${markerColor}" stroke-width="${thickness}" />`;
           }
 
-          // Dynamic font size so text doesn't bleed at small tile sizes
-          const fontSize = Math.max(3, tileSize * 0.12);
+          // Improved scaling for text size
+          // For very small markers, reduce the text size more aggressively
+          let fontSize;
+          if (tileSize < 5) {
+            fontSize = Math.max(1, tileSize * 0.08); // More aggressive scaling for tiny tiles
+          } else {
+            fontSize = Math.max(3, tileSize * 0.12);
+          }
 
           // Place text below markers - improved positioning with better responsiveness to tile size
           if (showText) {
             // Calculate the proper y-position based on marker existence
             const yText = tileSize + (includeLine ? (gap + thickness + textGap) : textGap) + fontSize * 0.3;
             
-            // Create a background rectangle for better text visibility
-            const textWidth = labelText.length * fontSize * 0.65; // approx width calculation
-            const textHeight = fontSize * 1.2;
-            const textX = 0;
-            
             // Add text with proper alignment that stays within the marker width
-            svg += `<text x="${textX}" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start">${labelText}</text>`;
+            svg += `<text x="0" y="${yText}" font-size="${fontSize}" fill="#333" text-anchor="start">${labelText}</text>`;
           }
 
           svg += `</g>`; // end tile group
