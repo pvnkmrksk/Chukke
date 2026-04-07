@@ -2,7 +2,7 @@
 
 Chukké (ಚುಕ್ಕೆ) means "dots" or "marks" in Kannada, which perfectly represents this tool's purpose: creating unique visual identification tags for tracking or marking items.
 
-🚀 **[Try it now: Launch Chukké Tag Generator](https://pvnkmrksk.github.io/Chukke/)**
+🚀 **[Try it now: Launch Chukké Tag Generator](https://chukke.kutuhula.in/)**
 
 <div align="center">
   <img src="./anim.gif" alt="Animated Chukké tags showcase" width="240" />
@@ -98,5 +98,5 @@ Contributions, suggestions, and bug reports are welcome! Feel free to open an is
 ---
 
 <div align="center">
-  Made with ❤️ by <a href="https://twitter.com/pvnkmrksk" target="_blank">@pvnkmrksk</a>
+  Made with ❤️ by <a href="https://chukke.kutuhula.in/">kutūhuḷa</a>
 </div>
