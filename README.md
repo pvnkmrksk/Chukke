@@ -98,5 +98,5 @@ Contributions, suggestions, and bug reports are welcome! Feel free to open an is
 ---
 
 <div align="center">
-  Made with ❤️ by <a href="https://chukke.kutuhula.in/">kutūhuḷa</a>
+  Made with ❤️ by <a href="https://kutuhula.in/">kutūhuḷa</a>
 </div>
